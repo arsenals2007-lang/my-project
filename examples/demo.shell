@@ -1,0 +1,10 @@
+# Успешная демонстрация без намеренных ошибок.
+pwd
+ls -al
+tree -a
+cd /home/student/projects/demo
+pwd
+ls -l
+cal 10 2026
+cd /
+exit

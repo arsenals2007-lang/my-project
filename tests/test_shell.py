@@ -13,10 +13,12 @@ class ShellTests(unittest.TestCase):
         self.output = []
         self.shell = Shell(output=self.output.append)
 
-    def test_stubs(self):
-        """Заглушки показывают имя команды и аргументы."""
-        self.assertTrue(self.shell.execute('ls "a b"'))
-        self.assertEqual(self.output, ["ls: ['a b']"])
+    def test_empty_vfs(self):
+        """Пустая VFS имеет корень и пустой список файлов."""
+        self.assertTrue(self.shell.execute("ls"))
+        self.assertEqual(self.output, [])
+        self.assertTrue(self.shell.execute("pwd"))
+        self.assertEqual(self.output, ["/"])
 
     def test_errors_keep_session_alive(self):
         """Ошибка не завершает интерактивный сеанс."""

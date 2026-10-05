@@ -1,0 +1,33 @@
+# Все реализованные режимы основных команд.
+pwd
+ls
+ls -a
+ls -l
+ls -al /home
+ls -- /etc/config.txt
+cd /home/student
+cd projects/demo
+pwd
+cd ..
+cd -
+cd
+cd "folder with spaces"
+cd /
+tree
+tree -a
+tree /etc
+tree /etc/config.txt
+cal
+cal 2026
+cal 2 2024
+# Намеренные ошибки: исполнение продолжается, код выхода 1.
+ls -z
+ls a b
+cd /etc/config.txt
+cd /missing
+pwd extra
+tree -z
+cal 13 2026
+cal 0
+cal text
+exit

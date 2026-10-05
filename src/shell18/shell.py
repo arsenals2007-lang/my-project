@@ -5,6 +5,7 @@ import socket
 
 from .parser import parse_command
 from .vfs import VFS
+from .commands import Commands
 
 
 class Shell:
@@ -18,6 +19,8 @@ class Shell:
         self.running = True
         self.cwd = "/"
         self.vfs = VFS() if vfs is None else vfs
+        self.previous = "/"
+        self.commands = Commands(self)
 
     def prompt(self):
         """Сформировать приглашение из данных ОС и текущего пути."""
@@ -30,16 +33,10 @@ class Shell:
             if not tokens:
                 return True
             command, *arguments = tokens
-            if command == "exit":
-                if arguments:
-                    raise ValueError("exit: аргументы не поддерживаются")
-                self.running = False
-            elif command in ("ls", "cd"):
-                if len(arguments) > 1:
-                    raise ValueError(f"{command}: слишком много аргументов")
-                self.output(f"{command}: {arguments!r}")
-            else:
+            handler = self.commands.handlers.get(command)
+            if handler is None:
                 raise ValueError(f"неизвестная команда: {command}")
+            handler(arguments)
             return True
         except ValueError as error:
             self.output(f"Ошибка: {error}")
