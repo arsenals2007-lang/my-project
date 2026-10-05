@@ -1,0 +1,7 @@
+# Ошибки не мешают исполнению следующих строк.
+unknown
+cd a b
+ls "unfinished
+exit extra
+ls
+exit

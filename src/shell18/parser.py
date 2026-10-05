@@ -36,6 +36,8 @@ def parse_command(text, environment=None):
             if active:
                 tokens.append("".join(buffer))
                 buffer, active = [], False
+        elif char == "#" and quote is None:
+            break
         elif char == "$" and quote != "'":
             value, position = expand_variable(text, position, environment)
             buffer.append(value)
