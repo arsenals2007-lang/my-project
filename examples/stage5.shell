@@ -1,0 +1,43 @@
+# Все режимы mkdir и chown на deep.xml.
+pwd
+ls -al
+tree -a
+cal 2 2024
+mkdir /new
+mkdir /new/first /new/second
+mkdir "space directory"
+mkdir -p /new/parents/child
+mkdir -p /new/parents/child
+mkdir -- -dash
+ls -l /
+cd /new
+mkdir relative
+cd relative
+pwd
+cd -
+chown alice /new/relative
+ls -l /new
+chown alice:staff /new/first /new/second
+chown :students /new/relative
+chown bob: /new/relative
+chown -R student:students /new
+tree -a /new
+ls -l /new
+ls -l /new/parents
+chown -- alice /-dash
+# Ошибки, затем успешная команда для проверки продолжения.
+mkdir /new
+mkdir /missing/child
+mkdir /etc/config.txt/child
+mkdir
+mkdir ""
+mkdir -z /bad
+chown
+chown alice /missing
+chown alice:staff:extra /new
+chown : /new
+chown -z alice /new
+unknown
+exit extra
+pwd
+exit

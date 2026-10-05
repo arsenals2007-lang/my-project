@@ -6,6 +6,7 @@ import socket
 from .parser import parse_command
 from .vfs import VFS
 from .commands import Commands
+from .mutations import Mutations
 
 
 class Shell:
@@ -21,6 +22,8 @@ class Shell:
         self.vfs = VFS() if vfs is None else vfs
         self.previous = "/"
         self.commands = Commands(self)
+        self.mutations = Mutations(self)
+        self.handlers = {**self.commands.handlers, **self.mutations.handlers}
 
     def prompt(self):
         """Сформировать приглашение из данных ОС и текущего пути."""
@@ -33,7 +36,7 @@ class Shell:
             if not tokens:
                 return True
             command, *arguments = tokens
-            handler = self.commands.handlers.get(command)
+            handler = self.handlers.get(command)
             if handler is None:
                 raise ValueError(f"неизвестная команда: {command}")
             handler(arguments)

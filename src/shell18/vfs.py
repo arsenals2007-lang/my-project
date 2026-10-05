@@ -81,12 +81,12 @@ class VFS:
 
     @classmethod
     def load(cls, path):
-        """Прочитать XML и сообщить об ошибке файла или структуры."""
+        """Прочитать UTF-8 XML и сообщить об ошибке файла или структуры."""
         try:
-            raw = Path(path).read_bytes()
-            if b"<!DOCTYPE" in raw.upper() or b"<!ENTITY" in raw.upper():
+            text = Path(path).read_bytes().decode("utf-8-sig")
+            if "<!DOCTYPE" in text.upper() or "<!ENTITY" in text.upper():
                 raise ValueError("DTD и сущности в VFS не поддерживаются")
-            root = ET.fromstring(raw)
+            root = ET.fromstring(text)
             if root.tag != "vfs" or set(root.attrib) - {"name"}:
                 raise ValueError("ожидался корневой элемент <vfs name=...>")
             vfs = cls(root.get("name", Path(path).stem))
@@ -102,20 +102,24 @@ class VFS:
         parts = [] if path.startswith("/") else cwd.strip("/").split("/")
         parts = [part for part in parts if part]
         for part in path.split("/"):
-            current = "/" + "/".join(parts)
-            if not self.nodes[current].directory:
-                raise ValueError(f"не каталог: {current}")
-            if part in ("", "."):
-                continue
-            if part == "..":
-                if parts:
-                    parts.pop()
-                continue
-            parts.append(part)
-            candidate = "/" + "/".join(parts)
-            if candidate not in self.nodes:
-                raise ValueError(f"путь не найден: {candidate}")
+            self.walk_component(parts, part)
         return "/" + "/".join(parts)
+
+    def walk_component(self, parts, part):
+        """Обработать один компонент пути с проверкой типа родителя."""
+        current = "/" + "/".join(parts)
+        if not self.nodes[current].directory:
+            raise ValueError(f"не каталог: {current}")
+        if part in ("", "."):
+            return
+        if part == "..":
+            if parts:
+                parts.pop()
+            return
+        parts.append(part)
+        candidate = "/" + "/".join(parts)
+        if candidate not in self.nodes:
+            raise ValueError(f"путь не найден: {candidate}")
 
     def children(self, path, show_hidden=True):
         """Вернуть отсортированные прямые дочерние пути каталога."""

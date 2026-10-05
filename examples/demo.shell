@@ -7,4 +7,8 @@ pwd
 ls -l
 cal 10 2026
 cd /
+mkdir -p /demo/nested
+chown -R student:students /demo
+ls -l /demo
+tree /demo
 exit

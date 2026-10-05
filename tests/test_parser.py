@@ -30,3 +30,11 @@ class ParserTests(unittest.TestCase):
         for text in ('ls "abc', "cd '", "ls \\"):
             with self.subTest(text=text), self.assertRaises(ValueError):
                 parse_command(text)
+
+    def test_values_are_data(self):
+        """Кавычки и # из окружения не меняют синтаксис команды."""
+        env = {"VALUE": 'a b # " cd /other'}
+        self.assertEqual(parse_command("ls $VALUE", env),
+                         ["ls", env["VALUE"]])
+        self.assertEqual(parse_command('ls "$MISSING"', {}), ["ls", ""])
+        self.assertEqual(parse_command(r'ls "a\q"'), ["ls", r"a\q"])

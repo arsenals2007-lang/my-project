@@ -2,6 +2,9 @@
 ls
 cd /home/student/projects/demo
 ls "folder with spaces"
+cd "$HOME"
+cd '$HOME'
 unknown
 cd a b
+exit extra
 exit

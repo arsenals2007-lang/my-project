@@ -8,6 +8,7 @@ from .options import check_count, parse_options
 
 MIN_YEAR, MAX_YEAR = 1, 9999
 MIN_MONTH, MAX_MONTH = 1, 12
+CAL_YEAR_ARGUMENTS, CAL_MONTH_YEAR_ARGUMENTS = 1, 2
 
 
 class Commands:
@@ -78,32 +79,45 @@ class Commands:
         self.print_tree(path, "", "a" in flags)
 
     def print_tree(self, path, prefix, show_hidden):
-        """Рекурсивно вывести дочерние узлы с соединительными линиями."""
+        """Вывести дочерние узлы через стек без ограничения рекурсии."""
         vfs = self.shell.vfs
         if not vfs.nodes[path].directory:
             return
-        children = vfs.children(path, show_hidden)
-        last_index = len(children) - 1
-        for index, name in enumerate(children):
-            last = index == last_index
-            branch = "└── " if last else "├── "
-            self.shell.output(prefix + branch + name.rsplit("/", 1)[-1])
-            extension = "    " if last else "│   "
-            self.print_tree(name, prefix + extension, show_hidden)
+        pending = [(path, prefix, None)]
+        while pending:
+            name, current_prefix, last = pending.pop()
+            if last is not None:
+                branch = "└── " if last else "├── "
+                label = name.rsplit("/", 1)[-1]
+                self.shell.output(current_prefix + branch + label)
+                current_prefix += "    " if last else "│   "
+            children = vfs.children(name, show_hidden)
+            last_index = len(children) - 1
+            for index in reversed(range(len(children))):
+                pending.append((
+                    children[index], current_prefix, index == last_index
+                ))
 
     def cal(self, arguments):
         """Вывести текущий месяц, весь год или указанный месяц и год."""
         check_count(arguments, 0, 2, "cal [год] | cal месяц год")
         today = date.today()
-        values = [int(value) for value in arguments]
+        try:
+            values = [int(value) for value in arguments]
+        except ValueError as error:
+            raise ValueError("cal: месяц и год должны быть числами") from error
         year = values[-1] if values else today.year
-        month = values[0] if len(values) == 2 else today.month
+        month = values[0] if len(values) == CAL_MONTH_YEAR_ARGUMENTS else (
+            today.month
+        )
         if not MIN_YEAR <= year <= MAX_YEAR:
             raise ValueError("cal: год должен быть от 1 до 9999")
         if not MIN_MONTH <= month <= MAX_MONTH:
             raise ValueError("cal: месяц должен быть от 1 до 12")
         printer = calendar.TextCalendar(firstweekday=calendar.MONDAY)
-        rendered = printer.formatyear(year) if len(values) == 1 else (
+        rendered = printer.formatyear(year) if len(values) == (
+            CAL_YEAR_ARGUMENTS
+        ) else (
             printer.formatmonth(year, month)
         )
         self.shell.output(rendered.rstrip())
