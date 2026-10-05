@@ -5,6 +5,7 @@ import sys
 
 from .shell import Shell
 from .startup import run_script
+from .vfs import VFS
 
 
 def read_options(argv):
@@ -24,7 +25,12 @@ def main(argv=None):
     print(f"[config] vfs={options.vfs!r}")
     print(f"[config] script={options.script!r}")
     print(f"[config] batch={options.batch}")
-    shell = Shell()
+    try:
+        vfs = VFS.load(options.vfs) if options.vfs else VFS()
+    except ValueError as error:
+        print(f"Ошибка: {error}", file=sys.stderr)
+        return 1
+    shell = Shell(vfs=vfs)
     try:
         success = run_script(shell, options.script)
     except (OSError, UnicodeError) as error:

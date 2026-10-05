@@ -4,18 +4,20 @@ import getpass
 import socket
 
 from .parser import parse_command
+from .vfs import VFS
 
 
 class Shell:
     """Хранит состояние сеанса и выполняет команды эмулятора."""
 
-    def __init__(self, output=print):
+    def __init__(self, output=print, vfs=None):
         """Настроить вывод и получить реальные имя пользователя и хост."""
         self.output = output
         self.username = getpass.getuser()
         self.hostname = socket.gethostname()
         self.running = True
         self.cwd = "/"
+        self.vfs = VFS() if vfs is None else vfs
 
     def prompt(self):
         """Сформировать приглашение из данных ОС и текущего пути."""

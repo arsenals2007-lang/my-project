@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vfs name="deep">
+  <directory name="home">
+    <directory name="student" owner="student" group="students">
+      <directory name="projects">
+        <directory name="demo">
+          <file name="readme.txt">Виртуальный файл на четвертом уровне</file>
+        </directory>
+      </directory>
+    </directory>
+  </directory>
+  <directory name="etc"><file name="config.txt">mode=demo</file></directory>
+  <directory name="folder with spaces" />
+  <file name=".hidden">hidden</file>
+</vfs>

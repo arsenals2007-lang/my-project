@@ -1,0 +1,7 @@
+# Загрузка VFS выполняется перед скриптом; команды пока заглушки.
+ls
+cd /home/student/projects/demo
+ls "folder with spaces"
+unknown
+cd a b
+exit

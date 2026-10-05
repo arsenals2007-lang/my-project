@@ -67,3 +67,38 @@ sh scripts/test_errors.sh
 
 `read_options` разбирает аргументы, `main` управляет запуском,
 `run_script` исполняет стартовый файл.
+
+## Этап 3: VFS
+
+XML читается один раз, узлы и байты хранятся в памяти. Исходный файл
+не меняется. Если `--vfs` отсутствует, создается пустой корень в памяти.
+Ошибка чтения или формата VFS завершает программу с кодом 1.
+`examples/minimal.xml`, `files.xml`, `deep.xml` демонстрируют пустую ФС,
+несколько файлов и более трех уровней вложенности.
+
+```xml
+<vfs name="example">
+  <directory name="home" owner="student" group="students">
+    <file name="note.txt" encoding="utf-8">Текст</file>
+    <file name="data.bin" encoding="base64">AAEC/w==</file>
+  </directory>
+</vfs>
+```
+
+`name` обязателен у каждого файла и каталога; `/`, `.` и `..` запрещены
+в именах. `owner` и `group` по умолчанию равны `user` и `users`.
+У файла `encoding` равен `utf-8` (по умолчанию) или `base64`.
+Имена в одном каталоге уникальны. Неизвестные элементы, атрибуты,
+кодировки, DTD, некорректный base64 и текст внутри каталога отвергаются.
+
+`Node` хранит тип, байты и владельца; `VFS.load` загружает источник;
+`validate_element`, `file_data`, `load_children` проверяют схему.
+`VFS.resolve` обрабатывает абсолютные и относительные пути, `.` и `..`;
+выход выше корня остается в `/`. `VFS.children` перечисляет прямые узлы.
+
+```sh
+sh scripts/test_vfs.sh
+sh run.sh --vfs examples/deep.xml --script examples/stage3.shell --batch
+```
+
+Скрипт stage3 содержит намеренные ошибки и возвращает код 1.
